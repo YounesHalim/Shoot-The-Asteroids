@@ -6,4 +6,6 @@ class Layer(IntEnum):
     ASTEROID = auto()
     ALIEN = auto()
     PLAYER = auto()
+    WEAPON = auto()
+    EXPLOSION = auto()
     UI = auto()
