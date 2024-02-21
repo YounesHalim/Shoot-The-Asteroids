@@ -6,28 +6,37 @@ import configs
 from layer import Layer
 import random
 
+from game_objects.spaceship import Spaceship
+
 
 class Asteroid(pygame.sprite.Sprite):
-    def __init__(self, *groups: AbstractGroup):
+    def __init__(self, *groups: AbstractGroup, x=None, y=None):
         self._layer = Layer.ASTEROID
-        self.images = Asteroid.get_asteroids()
+        self.images = Asteroid.__get_asteroids()
         self.image = self.images[0]
-        self.rect = self.image.get_rect(topleft=(random.randint(0, configs.SCREEN_WIDTH), 0))
+        self.rect = self.image.get_rect(topleft=(random.randint(0, configs.SCREEN_WIDTH - 64), 0))
         self.mask = pygame.mask.from_surface(self.image)
-        self.animate = 0
+        self.animation_speed = 0
         super().__init__(*groups)
 
     def update(self, *args, **kwargs):
-        self.animate += 1
-        index = self.animate // 10 % len(self.images)
-        self.image = self.images[index]
-        self.rect.y += 1
+        self.__animate_asteroid()
+        self.rect.y += 2
         if self.rect.y >= configs.SCREEN_HEIGHT:
             self.rect.y = 0
-            self.rect.x = random.randint(0, configs.SCREEN_WIDTH)
+            self.rect.x = random.randint(0, configs.SCREEN_WIDTH - 64)
+        self.__collision()
+
+    def __animate_asteroid(self):
+        self.animation_speed += 10
+        index = self.animation_speed // 10 % len(self.images)
+        self.image = self.images[index]
+
+    def __collision(self):
+        pass
 
     @staticmethod
-    def get_asteroids():
+    def __get_asteroids():
         terminate = False
         counter = 0
         images = []
@@ -37,8 +46,7 @@ class Asteroid(pygame.sprite.Sprite):
                 asteroid_sprite = assets.get_sprite(file_name)
                 images.append(asteroid_sprite)
                 counter += 1
-            except Exception as e:
-                print(e)
+            except Exception:
                 terminate = True
 
         return images
