@@ -5,7 +5,7 @@ import assets
 from layer import Layer
 
 
-class Explode(pygame.sprite.Sprite):
+class ExplosionEffect(pygame.sprite.Sprite):
     def __init__(self, *groups: AbstractGroup, x, y):
         self._layer = Layer.EXPLOSION
         self.explosion_speed = 4
