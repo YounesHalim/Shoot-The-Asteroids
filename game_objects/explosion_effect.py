@@ -6,7 +6,7 @@ from layer import Layer
 
 
 class ExplosionEffect(pygame.sprite.Sprite):
-    def __init__(self, *groups: AbstractGroup, x, y):
+    def __init__(self, *groups: AbstractGroup, x: int, y: int):
         self._layer = Layer.EXPLOSION
         self.explosion_speed = 4
         terminate = False
@@ -19,8 +19,7 @@ class ExplosionEffect(pygame.sprite.Sprite):
                 explosion = pygame.transform.scale(explosion, (130, 130))
                 self.images.append(explosion)
                 counter += 1
-            except Exception as e:
-                print(e)
+            except KeyError:
                 terminate = True
 
         self.index = 0
