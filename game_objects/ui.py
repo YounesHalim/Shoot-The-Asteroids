@@ -1,14 +1,14 @@
 from pygame.sprite import AbstractGroup
-
 import assets
 import configs
+from game_objects.asteroid import Asteroid
 from layer import Layer
 import pygame
 
 
 class Score(pygame.sprite.Sprite):
     def __init__(self, *groups: AbstractGroup):
-        self._layer = Layer.UI
+        self._layer = Layer.SCORE
         self.value = 0
         self.image = pygame.surface.Surface((0, 0), pygame.SRCALPHA)
         self.__create()
@@ -38,8 +38,32 @@ class Score(pygame.sprite.Sprite):
 
 
 class GameMessage(pygame.sprite.Sprite):
-    def __init__(self, *groups, sprite_name: str):
-        self._layer = Layer.UI
-        self.image = assets.get_sprite(sprite_name)
-        self.rect = self.image.get_rect(center=(configs.SCREEN_WIDTH / 2, configs.SCREEN_HEIGHT / 2))
+    asteroids = []
+
+    def __init__(self, *groups, sprite_name: str = 'game_over'):
+        self._layer = Layer.GAME_OVER
+        self.image = pygame.transform.scale(assets.get_sprite(sprite_name), (300, 300))
+        self.rect = self.image.get_rect(center=((configs.SCREEN_WIDTH / 2) + 30, configs.SCREEN_HEIGHT / 2))
+        self.last_frame_update = 0
+        self.animation_delay = 50
         super().__init__(*groups)
+
+
+class CounterHitSys(pygame.sprite.Sprite):
+    def __init__(self, *groups: AbstractGroup, asteroid: Asteroid):
+        self._layer = Layer.SCORE
+        self.image = pygame.transform.scale(assets.get_sprite('1'), (10, 10))
+        self.rect = self.image.get_rect(topright=(asteroid.rect.x + 10, asteroid.rect.y))
+        self.last_frame_updated = 0
+        self.animation = 300
+        super().__init__(*groups)
+
+    def update(self, *args, **kwargs):
+        self.__fadeout()
+
+    def __fadeout(self):
+        self.rect.y -= 4
+        current_time = pygame.time.get_ticks()  # Get the current time
+        if current_time - self.last_frame_updated >= self.animation:
+            self.kill()
+            self.last_frame_updated = current_time
