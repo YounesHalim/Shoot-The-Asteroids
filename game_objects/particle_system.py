@@ -3,6 +3,7 @@ import random
 import pygame
 from pygame.sprite import AbstractGroup
 
+import configs
 from layer import Layer
 
 
@@ -17,7 +18,7 @@ class Particle(pygame.sprite.Sprite):
             self.vel = pygame.math.Vector2(random.randint(-1, 1), random.randint(-1, 1))
         self.vel.normalize_ip()  # Normalize the vector
         self.vel *= random.randint(1, 3)  # Scale the normalized vector
-        self.lifetime = 60  # Lifetime of the particle in frames
+        self.lifetime = configs.FPS  # Lifetime of the particle in frames
         super().__init__(*groups)
 
     def update(self):
