@@ -36,34 +36,51 @@ class Score(pygame.sprite.Sprite):
     def update(self):
         self.__create()
 
+    def counter_sys(self) -> None:
+        return self.__create()
+
 
 class GameMessage(pygame.sprite.Sprite):
-    asteroids = []
 
     def __init__(self, *groups, sprite_name: str = 'game_over'):
         self._layer = Layer.GAME_OVER
         self.image = pygame.transform.scale(assets.get_sprite(sprite_name), (300, 300))
         self.rect = self.image.get_rect(center=((configs.SCREEN_WIDTH / 2) + 30, configs.SCREEN_HEIGHT / 2))
-        self.last_frame_update = 0
-        self.animation_delay = 50
         super().__init__(*groups)
 
 
 class CounterHitSys(pygame.sprite.Sprite):
-    def __init__(self, *groups: AbstractGroup, asteroid: Asteroid):
+    def __init__(self, *groups: AbstractGroup,
+                 asteroid: Asteroid,
+                 scale: tuple = (10, 10)):
+
         self._layer = Layer.SCORE
-        self.image = pygame.transform.scale(assets.get_sprite('1'), (10, 10))
+        self.sprite_asset = assets.get_sprite('1')
+        self.scalex, self.scale_y = scale[0], scale[1]
+        self.image = pygame.transform.scale(self.sprite_asset, (self.scalex, self.scale_y))
         self.rect = self.image.get_rect(topright=(asteroid.rect.x + 10, asteroid.rect.y))
-        self.last_frame_updated = 0
-        self.animation = 300
+        self.__lifetime = configs.FPS
+        self.__fade_start = configs.FPS // 2  # Start fading out halfway through the lifetime
+        self.__fade_duration = configs.FPS // 10  # Fading duration
+        self.__fade_alpha = 255  # Initial opacity
         super().__init__(*groups)
 
     def update(self, *args, **kwargs):
         self.__fadeout()
+        self.__scale_image()
 
     def __fadeout(self):
-        self.rect.y -= 4
-        current_time = pygame.time.get_ticks()  # Get the current time
-        if current_time - self.last_frame_updated >= self.animation:
+        self.__lifetime -= 3
+        if self.__lifetime <= self.__fade_start:
+            self.__fade_alpha -= 255 / self.__fade_duration
+            self.image.set_alpha(max(0, int(self.__fade_alpha)))
+
+        if self.__lifetime <= 0:
             self.kill()
-            self.last_frame_updated = current_time
+
+    def __scale_image(self):
+        self.rect.y -= 1
+        self.scalex += 1
+        self.scale_y += 1
+        self.image = pygame.transform.scale(self.sprite_asset, (self.scalex, self.scale_y))
+
