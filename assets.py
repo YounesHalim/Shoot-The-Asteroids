@@ -2,6 +2,7 @@ import os
 import pygame
 from pygame.mixer import Sound
 from pygame.sprite import Sprite
+from pygame.surface import Surface, SurfaceType
 
 sprites = {}
 audios = {}
@@ -16,14 +17,17 @@ def load_sprites() -> None:
             continue
 
 
-def get_sprite(name: str) -> Sprite:
+def get_sprite(name: str) -> Surface | SurfaceType:
     return sprites[name]
 
 
 def load_audios() -> None:
     path = os.path.join("assets", "audios")
     for file in os.listdir(path):
-        audios[file.split('.')[0]] = pygame.mixer.Sound(os.path.join(path, file))
+        try:
+            audios[file.split('.')[0]] = pygame.mixer.Sound(os.path.join(path, file))
+        except Exception:
+            continue
 
 
 def get_audio(name: str) -> Sound:
