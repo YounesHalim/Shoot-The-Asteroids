@@ -2,6 +2,7 @@ from pygame.sprite import AbstractGroup
 import assets
 import configs
 from game_objects.asteroid import Asteroid
+from game_objects.sound import SoundFX
 from layer import Layer
 import pygame
 
@@ -49,9 +50,13 @@ class GameMessage(pygame.sprite.Sprite):
         super().__init__(*groups)
 
 
-class CounterHitSys(pygame.sprite.Sprite):
+class CounterHitSys(pygame.sprite.Sprite, SoundFX):
+    __COUNTER = 0
+    __HIT_SOUND_FX = 'hit'
+
     def __init__(self, *groups: AbstractGroup,
                  asteroid: Asteroid,
+                 score: Score,
                  scale: tuple = (10, 10)):
 
         self._layer = Layer.SCORE
@@ -63,6 +68,10 @@ class CounterHitSys(pygame.sprite.Sprite):
         self.__fade_start = configs.FPS // 2  # Start fading out halfway through the lifetime
         self.__fade_duration = configs.FPS // 10  # Fading duration
         self.__fade_alpha = 255  # Initial opacity
+        self.score = score
+        self.hit_sound = assets.get_audio(self.__HIT_SOUND_FX)
+        self.play()
+        self.ast_is_destroyed = asteroid.is_destroyed()
         super().__init__(*groups)
 
     def update(self, *args, **kwargs):
@@ -77,6 +86,9 @@ class CounterHitSys(pygame.sprite.Sprite):
 
         if self.__lifetime <= 0:
             self.kill()
+        if self.ast_is_destroyed:
+            self.score.value += 4
+            self.ast_is_destroyed = False
 
     def __scale_image(self):
         self.rect.y -= 1
@@ -84,3 +96,17 @@ class CounterHitSys(pygame.sprite.Sprite):
         self.scale_y += 1
         self.image = pygame.transform.scale(self.sprite_asset, (self.scalex, self.scale_y))
 
+    def play(self):
+        try:
+            self.hit_sound.play().set_volume(.3)
+        except AttributeError as error:
+            print(error)
+
+    def pause(self):
+        raise NotImplemented()
+
+    def fade_in(self):
+        raise NotImplemented()
+
+    def fade_out(self):
+        raise NotImplemented()
