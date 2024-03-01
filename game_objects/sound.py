@@ -1,0 +1,13 @@
+from abc import ABC, abstractmethod
+
+
+class SoundFX(ABC):
+    @abstractmethod
+    def play(self): ...
+    @abstractmethod
+    def pause(self): ...
+    @abstractmethod
+    def fade_in(self): ...
+    @abstractmethod
+    def fade_out(self): ...
+
