@@ -2,6 +2,7 @@ import random
 
 import pygame
 from pygame.sprite import AbstractGroup
+from pygame.math import Vector2
 
 import assets
 import configs
@@ -9,6 +10,8 @@ from layer import Layer
 
 
 class Asteroid(pygame.sprite.Sprite):
+    __COUNTER = 2
+    __ASTEROIDS = []
 
     def __init__(self,
                  *groups: AbstractGroup,
@@ -31,14 +34,16 @@ class Asteroid(pygame.sprite.Sprite):
 
         self.image = self.images[0]
         self.rect = self.image.get_rect(topleft=(random.randint(0, configs.SCREEN_WIDTH - self.image.get_width()), 0))
+        self.vel = Vector2(random.randint(-4, 1), 3.5)
         self.mask = pygame.mask.from_surface(self.image)
         self.__health = 100
+        self.counter = 0
         self.animation_speed = 0
+        self.delay = configs.FPS // 3
         super().__init__(*groups)
 
     def update(self, *args, **kwargs):
         self.__animate_asteroid()
-        self.__asteroid_drop()
 
     def __animate_asteroid(self):
         self.animation_speed += 10
@@ -52,7 +57,7 @@ class Asteroid(pygame.sprite.Sprite):
 
     def asteroid_hit(self, damage: int = 30):
         self.__health -= damage
-        self.rect.y -= 10.5
+        self.vel.rotate(40)
         if self.__health <= 0:
             self.kill()
 
@@ -62,3 +67,26 @@ class Asteroid(pygame.sprite.Sprite):
     def is_destroyed(self) -> bool:
         return True if self.__health <= 0 else False
 
+    def asteroid_behavior(self, asteroids: list):
+        self.rect.move_ip(self.vel)
+
+        if self.rect.x <= 0 or self.rect.x > configs.SCREEN_WIDTH - self.image.get_width():
+            self.vel.reflect_ip(Vector2(-3, 0))
+            # print('Wall hit')
+
+        if self.rect.bottom >= configs.SCREEN_HEIGHT or self.rect.top == 0:
+            self.counter += 1
+            self.vel.y += 1
+            self.vel.reflect_ip(Vector2(0, 3))
+            # print('bottom hit!')
+
+        if self.rect.top <= 0:
+            self.counter += 1
+            self.vel.y += 1
+            self.vel.reflect_ip(Vector2(0, -3))
+            # print('top hit')
+
+        if self.counter > self.__COUNTER:
+            # print('Hi !')
+            self.kill()
+            asteroids.remove(self)
