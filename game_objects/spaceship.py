@@ -1,8 +1,12 @@
+from typing import Union
+
 import pygame
 from pygame.sprite import AbstractGroup
 
 import assets
 import configs
+from game_sys.explosion_fx_sys import ExplosionFX
+from game_sys.particle_sys import ParticleFX
 from layer import Layer
 from abc import ABC, abstractmethod
 
@@ -20,6 +24,8 @@ class Spaceship(pygame.sprite.Sprite):
         self.move = 4
         self.spaceship_health = self.__SPACESHIP_HEALTH
         self.mask = pygame.mask.from_surface(self.image)
+        self.groups = groups
+        self.destroy: Union[ExplosionFX, None] = None
         super().__init__(*groups)
 
     def __setstate__(self, state):
@@ -58,10 +64,8 @@ class Spaceship(pygame.sprite.Sprite):
         elif self.rect.bottom >= configs.SCREEN_HEIGHT:
             self.rect.bottom = configs.SCREEN_HEIGHT
 
-    def decrease_health(self, hit_damage: int = 50) -> None:
-        self.spaceship_health -= hit_damage
-        if self.spaceship_health <= 0:
-            self.kill()
+    def manage_health(self) -> None:
+        self.__setstate__(HealthManagementState(self))
 
     def get_health(self) -> int:
         return self.spaceship_health
@@ -126,7 +130,6 @@ class TiltRightState(SpaceshipState):
         self.spaceship.images = [
             pygame.transform.scale(assets.get_sprite('tilt_right_1'), (100, 100)),
             pygame.transform.scale(assets.get_sprite('tilt_right_2'), (100, 100))
-
         ]
         self.animation_speed = 0
         self.tilt_wing_right()
@@ -167,3 +170,33 @@ class IdleState(SpaceshipState):
 
     def tilt_wing_right(self, event=None):
         ...
+
+
+class HealthManagementState(SpaceshipState):
+
+    def __init__(self, spaceship: Spaceship):
+        self.spaceship = spaceship
+        self.health = self.spaceship.spaceship_health
+        self.destroyed()
+        pass
+
+    def fire(self, event=None): ...
+
+    def tilt_wing_left(self, event=None): ...
+
+    def tilt_wing_right(self, event=None): ...
+
+    def idle_state(self, event=None): ...
+
+    def damage_spaceship(self):
+        self.spaceship.spaceship_health -= 20
+
+    def destroyed(self):
+        self.damage_spaceship()
+        if self.health > 0:
+            [ParticleFX(self.spaceship.groups[0], pos=(self.spaceship.rect.centerx, self.spaceship.rect.centery)) for _
+             in range(10)]
+            return
+        ExplosionFX(self.spaceship.groups[0], collided=self.spaceship)
+        [ParticleFX(self.spaceship.groups[0], pos=(self.spaceship.rect.centerx, self.spaceship.rect.centery)) for _ in range(100)]
+        self.spaceship.kill()
