@@ -7,11 +7,11 @@ import configs
 from layer import Layer
 
 
-class Particle(pygame.sprite.Sprite):
-    def __init__(self, *groups: AbstractGroup, pos: tuple):
+class ParticleFX(pygame.sprite.Sprite):
+    def __init__(self, *groups: AbstractGroup, pos: tuple, color: tuple = (255, 255, 255)):
         self._layer = Layer.PARTICLE
         self.image = pygame.Surface((4, 4))
-        self.image.fill((255, 255, 255))
+        self.image.fill(color)
         self.rect = self.image.get_rect(center=pos)
         self.vel = pygame.math.Vector2(random.randint(-1, 1), random.randint(-1, 1))
         while self.vel.length() == 0:  # Check if the length is zero
