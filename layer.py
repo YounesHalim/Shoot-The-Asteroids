@@ -5,7 +5,7 @@ class Layer(IntEnum):
     BACKGROUND = auto()
     UI = auto()
     SCORE = auto()
-    NEW_GAME = ()
+    NEW_GAME = auto()
     ASTEROID = auto()
     GAME_OVER = auto()
     ALIEN = auto()
