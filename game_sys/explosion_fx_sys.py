@@ -7,7 +7,7 @@ from game_objects.sound import SoundFX
 from layer import Layer
 
 
-class ExplosionEffect(pygame.sprite.Sprite, SoundFX):
+class ExplosionFX(pygame.sprite.Sprite, SoundFX):
     __EXPLOSION__SOUND_FX = 'explosion'
     __SPACESHIP_EXPLOSION_SOUND_FX = 'spaceship_explosion'
 
