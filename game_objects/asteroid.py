@@ -49,6 +49,7 @@ class Asteroid(pygame.sprite.Sprite):
         self.animation_speed += 10
         index = self.animation_speed // 10 % len(self.images)
         self.image = self.images[index]
+        self.mask = pygame.mask.from_surface(self.image)
 
     def __asteroid_drop(self):
         self.rect.y += 3.5
