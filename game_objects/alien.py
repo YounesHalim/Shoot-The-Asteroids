@@ -67,7 +67,6 @@ class AlienSpaceship(pygame.sprite.Sprite):
         if self.distance != 0:
             if self.distance <= configs.SCREEN_HEIGHT / 2:
                 self.rect.x += self.speed * (self.spaceship_vector.x - self.rect.x) / self.distance
-                # self.rect.y -= self.speed * randint(100, 150) / self.distance
                 # self.rect.move_ip(Vector2(1, -3))
                 self.encounter_delay -= 1.3
                 self.attack_player()
@@ -96,5 +95,5 @@ class AlienSpaceship(pygame.sprite.Sprite):
         self.spaceship_health -= 20
 
     def is_destroyed(self) -> bool:
-        return True if self.spaceship_health <= 0 else False
+        return self.spaceship_health <= 0 or not self.alive()
 
