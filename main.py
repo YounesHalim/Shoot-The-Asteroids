@@ -30,7 +30,7 @@ if __name__ == '__main__':
     sprites = spawner.get_layer_updates
     asteroids: list[Asteroid] = spawner.spawned_asteroids
 
-    assets.get_audio('ost').play(loops=-1).set_volume(.8)
+    # assets.get_audio('ost').play(loops=-1).set_volume(.8)
     while run:
         events = pygame.event.get()
         # Handling events
@@ -66,7 +66,7 @@ if __name__ == '__main__':
                 # spawner.stop()
                 beams.clear()
                 game_over_message = GameMessage(sprites)
-            if len(beams) > 0:
+            if beams:
                 for beam in beams:
                     if asteroid.rect.collidepoint(beam.rect.centerx, beam.rect.centery) and not game_over:
                         [ParticleFX(sprites, pos=(asteroid.rect.centerx, asteroid.rect.centery)) for particle in
@@ -84,7 +84,7 @@ if __name__ == '__main__':
             GameMessage(sprites)
 
         # alien hit registration
-        if len(beams) > 0:
+        if beams:
             for beam in beams:
                 alien: AlienSpaceship
                 for alien in spawner.get_layer_updates.get_sprites_from_layer(Layer.ALIEN):
