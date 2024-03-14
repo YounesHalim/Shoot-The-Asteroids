@@ -2,6 +2,7 @@ from typing import Union
 
 import pygame
 from pygame.sprite import AbstractGroup
+from pygame.math import Vector2
 
 import assets
 import configs
@@ -21,7 +22,6 @@ class Spaceship(pygame.sprite.Sprite):
         self.state = IdleState(self)
         self.image = self.images[self.index]
         self.rect = self.image.get_rect(topleft=((configs.SCREEN_WIDTH // 2) - 32, configs.SCREEN_HEIGHT - 70))
-        self.move = 4
         self.spaceship_health = self.__SPACESHIP_HEALTH
         self.mask = pygame.mask.from_surface(self.image)
         self.groups = groups
@@ -46,9 +46,9 @@ class Spaceship(pygame.sprite.Sprite):
             self.__setstate__(TiltRightState(self))
         # Check for up and down movement
         if keys[pygame.K_DOWN] or keys[pygame.K_s]:
-            self.rect.y += self.move
+            self.__setstate__(MoveBackward(self))
         elif keys[pygame.K_UP] or keys[pygame.K_w]:
-            self.rect.y -= self.move
+            self.__setstate__(MoveForward(self))
 
         # If no keys pressed, return to idle state
         if not any(keys):
@@ -106,6 +106,7 @@ class TiltLeftState(SpaceshipState):
             pygame.transform.scale(assets.get_sprite('tilt_left_1'), (100, 100)),
             pygame.transform.scale(assets.get_sprite('tilt_left_2'), (100, 100))
         ]
+        self.vel = Vector2(-5, 0)
         self.tilt_wing_left()
 
     def fire(self, event=None): ...
@@ -115,7 +116,7 @@ class TiltLeftState(SpaceshipState):
     def idle_state(self, event=None): ...
 
     def tilt_wing_left(self, event=None):
-        self.spaceship.rect.x -= self.spaceship.move
+        self.spaceship.rect.move_ip(self.vel)
         self.spaceship.index += .1
         if self.spaceship.index < len(self.spaceship.images):
             self.spaceship.image = self.spaceship.images[int(self.spaceship.index)]
@@ -132,10 +133,11 @@ class TiltRightState(SpaceshipState):
             pygame.transform.scale(assets.get_sprite('tilt_right_2'), (100, 100))
         ]
         self.animation_speed = 0
+        self.vel = Vector2(5, 0)
         self.tilt_wing_right()
 
     def tilt_wing_right(self, event=None):
-        self.spaceship.rect.x += self.spaceship.move
+        self.spaceship.rect.move_ip(self.vel)
         self.spaceship.index += .1
         if self.spaceship.index < len(self.spaceship.images):
             self.spaceship.image = self.spaceship.images[int(self.spaceship.index)]
@@ -157,6 +159,7 @@ class IdleState(SpaceshipState):
         ]
         self.reversed = False
         self.spaceship.index = 0
+        self.vel = Vector2(0, 0)
         self.idle_state()
 
     def idle_state(self, event=None):
@@ -176,7 +179,6 @@ class HealthManagementState(SpaceshipState):
 
     def __init__(self, spaceship: Spaceship):
         self.spaceship = spaceship
-        self.health = self.spaceship.spaceship_health
         self.destroyed()
         pass
 
@@ -191,12 +193,62 @@ class HealthManagementState(SpaceshipState):
     def damage_spaceship(self):
         self.spaceship.spaceship_health -= 20
 
-    def destroyed(self):
+    def destroyed(self) -> None:
         self.damage_spaceship()
-        if self.health > 0:
+        if self.spaceship.spaceship_health == 0:
+            ExplosionFX(self.spaceship.groups[0], collided=self.spaceship)
             [ParticleFX(self.spaceship.groups[0], pos=(self.spaceship.rect.centerx, self.spaceship.rect.centery)) for _
-             in range(10)]
+             in range(100)]
+            self.spaceship.kill()
             return
-        ExplosionFX(self.spaceship.groups[0], collided=self.spaceship)
-        [ParticleFX(self.spaceship.groups[0], pos=(self.spaceship.rect.centerx, self.spaceship.rect.centery)) for _ in range(100)]
-        self.spaceship.kill()
+        [ParticleFX(self.spaceship.groups[0], pos=(self.spaceship.rect.centerx, self.spaceship.rect.centery)) for _
+         in range(10)]
+
+
+class MoveForward(SpaceshipState):
+    def __init__(self, spaceship: Spaceship):
+        self.spaceship = spaceship
+        self.vel = Vector2(0, -5)
+        self.move_forward()
+
+    def fire(self, event=None):
+        pass
+
+    def tilt_wing_left(self, event=None):
+        pass
+
+    def tilt_wing_right(self, event=None):
+        pass
+
+    def idle_state(self, event=None):
+        pass
+
+    def move_forward(self):
+        self.spaceship.rect.move_ip(self.vel)
+        pass
+
+
+class MoveBackward(SpaceshipState):
+    def __init__(self, spaceship: Spaceship):
+        self.spaceship = spaceship
+        self.vel = Vector2(0, 5)
+        self.move_backward()
+
+    def fire(self, event=None):
+        pass
+
+    def tilt_wing_left(self, event=None):
+        pass
+
+    def tilt_wing_right(self, event=None):
+        pass
+
+    def idle_state(self, event=None):
+        pass
+
+    def move_backward(self):
+        self.spaceship.rect.move_ip(self.vel)
+        pass
+
+    def super_speed(self):
+        pass
