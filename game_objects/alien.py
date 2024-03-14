@@ -20,7 +20,6 @@ class AlienSpaceship(pygame.sprite.Sprite):
         self.groups = groups
         self.spaceship: Spaceship = \
             [sprite for sprite in self.groups[0] if hasattr(sprite, '_layer') and sprite._layer == Layer.PLAYER][0]
-        self.beams = []
         self.alien_sprite = assets.get_sprite('spaceship')
         self.image = pygame.transform.scale(self.alien_sprite, (scale_x, scale_y)).convert_alpha()
         self.rand_pos = randint(self.image.get_width(), configs.SCREEN_WIDTH - self.image.get_width())
@@ -49,7 +48,7 @@ class AlienSpaceship(pygame.sprite.Sprite):
             self.counter = 0
             self.alien_vector = Vector2(self.rect.x, self.rect.y)
             self.spaceship_vector = Vector2(self.spaceship.rect.x, self.spaceship.rect.y)
-            self.distance = self.__compute_distance()
+            self.distance = self.alien_vector.distance_to(self.spaceship_vector)
 
         self.enemy_encounter()
         self.__encounter_finished()
@@ -71,6 +70,7 @@ class AlienSpaceship(pygame.sprite.Sprite):
                 self.encounter_delay -= 1.3
                 self.attack_player()
                 return
+            # vel = self.alien_vector.move_towards(self.spaceship_vector, 10)
             self.rect.x += self.speed * (self.spaceship_vector.x - self.rect.x) / self.distance
             self.rect.y += self.speed * (self.spaceship_vector.y - self.rect.y) / self.distance
 
