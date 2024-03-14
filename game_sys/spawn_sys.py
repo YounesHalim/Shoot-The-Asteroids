@@ -60,12 +60,11 @@ class SpawnSys(threading.Thread, WaveSys):
         Background(0, self.__sprites)
         Background(1, self.__sprites)
         spaceship = Spaceship(self.__sprites)
-        # Alien(spaceship, self.__sprites)
         StartGame(self.__sprites)
         return spaceship, Score(self.__sprites)
 
-    def spawn_aliens(self, number: int = None, delay: int | float = None):
-        ...
+    def spawn_aliens(self, number: int = 0, delay: int | float = 1):
+        AlienSpaceship(self.__sprites)
 
     def spawn_asteroids(self, number: int = 2, delay: int | float = 1):
         for i in range(number):
@@ -79,7 +78,7 @@ class SpawnSys(threading.Thread, WaveSys):
         return self.__asteroids
 
     @property
-    def spawned_aliens(self) -> list[AlienSpaceship]:
+    def spawned_aliens(self) -> list[threading.Thread]:
         return self.__aliens
 
     @property
@@ -118,13 +117,13 @@ class FirstWave(WaveSys):
         self.spawner = spawner
         self.wave = threading.Thread(target=self.spawn_asteroids, args=(self.__ASTEROIDS, self.__SPEED,))
         self.wave.start()
-        AlienSpaceship(self.spawner.get_layer_updates)
-        print(f'first wave {self}')
+        self.spawn_aliens()
 
     def spawn_asteroids(self, number: int = None, delay: int | float = None):
         self.spawner.spawn_asteroids(number, delay)
 
-    def spawn_aliens(self, number: int = None, delay: int | float = None): ...
+    def spawn_aliens(self, number: int = None, delay: int | float = None):
+        self.spawner.spawn_aliens(number)
 
 
 class SecondWave(WaveSys):
