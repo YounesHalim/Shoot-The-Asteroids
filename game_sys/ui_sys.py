@@ -1,10 +1,13 @@
+from typing import Union, Any
+
+import pygame
 from pygame.sprite import AbstractGroup
+
 import assets
 import configs
 from game_objects.asteroid import Asteroid
 from game_objects.sound import SoundFX
 from layer import Layer
-import pygame
 
 
 class Score(pygame.sprite.Sprite):
@@ -53,17 +56,21 @@ class GameMessage(pygame.sprite.Sprite):
 class CounterHitSys(pygame.sprite.Sprite, SoundFX):
     __COUNTER = 0
     __HIT_SOUND_FX = 'hit'
+    __ALIEN_SPACESHIP = 20
+    __ASTEROID = 4
 
     def __init__(self, *groups: AbstractGroup,
-                 asteroid: Asteroid,
+                 game_object: Union[Asteroid | Any],
                  score: Score,
                  scale: tuple = (10, 10)):
 
         self._layer = Layer.SCORE
+        self.groups = groups
+        self.game_object = game_object
         self.sprite_asset = assets.get_sprite('1')
         self.scalex, self.scale_y = scale[0], scale[1]
         self.image = pygame.transform.scale(self.sprite_asset, (self.scalex, self.scale_y))
-        self.rect = self.image.get_rect(topright=(asteroid.rect.x + 10, asteroid.rect.y))
+        self.rect = self.image.get_rect(topright=(self.game_object.rect.x + 10, self.game_object.rect.y))
         self.__lifetime = configs.FPS
         self.__fade_start = configs.FPS // 2  # Start fading out halfway through the lifetime
         self.__fade_duration = configs.FPS // 10  # Fading duration
@@ -71,7 +78,10 @@ class CounterHitSys(pygame.sprite.Sprite, SoundFX):
         self.score = score
         self.hit_sound = assets.get_audio(self.__HIT_SOUND_FX)
         self.play()
-        self.ast_is_destroyed = asteroid.is_destroyed()
+        self.ast_is_destroyed = self.game_object.is_destroyed()
+        self.alien_is_destroyed = self.game_object.is_destroyed()
+        self.mask = pygame.mask.from_surface(self.image)
+
         super().__init__(*groups)
 
     def update(self, *args, **kwargs):
@@ -87,7 +97,7 @@ class CounterHitSys(pygame.sprite.Sprite, SoundFX):
         if self.__lifetime <= 0:
             self.kill()
         if self.ast_is_destroyed:
-            self.score.value += 4
+            self.score.value += self.__ASTEROID
             self.ast_is_destroyed = False
 
     def __scale_image(self):
@@ -110,3 +120,41 @@ class CounterHitSys(pygame.sprite.Sprite, SoundFX):
 
     def fade_out(self):
         raise NotImplemented()
+
+
+class StartGame(pygame.sprite.Sprite):
+
+    def __init__(self, *groups: AbstractGroup):
+        self.__fade_duration = configs.FPS
+        self.__fade_alpha = 255
+        self._layer = Layer.NEW_GAME
+        self.images = [
+            pygame.transform.scale(assets.get_sprite('enter_white'), (200, 64)),
+            pygame.transform.scale(assets.get_sprite('enter_black'), (200, 64))
+        ]
+        self.index = 0
+        self.size = len(self.images)
+        self.image = self.images[self.index]
+        self.rect = self.image.get_rect(center=(configs.SCREEN_WIDTH / 2, configs.SCREEN_HEIGHT / 2))
+        self.animation_speed = configs.FPS
+        self.groups = groups
+        self.counter = 0
+        super().__init__(*groups)
+
+    def update(self, *args, **kwargs):
+        self.animate()
+        pass
+
+    def animate(self):
+        self.index += 0.03
+        index = int(self.index % self.size)  # Ensures index wraps around the size of images
+        alpha = (abs(self.size / 2 - index) / (self.size / 2)) * 255  # Calculate alpha value for fading effect
+        self.image = self.images[index].copy()  # Make a copy to avoid modifying original images
+        self.image.fill((255, 255, 255, alpha), special_flags=pygame.BLEND_RGBA_MULT)
+
+    def remove_intro_layout(self, gameplay_started: bool) -> None:
+        if gameplay_started:
+            for sprite in self.groups[0].sprites():
+                if hasattr(sprite, '_layer') and sprite.layer == Layer.NEW_GAME:
+                    sprite.kill()
+                    sprite.remove()
