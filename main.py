@@ -10,7 +10,7 @@ from game_objects.spaceship import Spaceship
 from game_objects.weapons import LaserBeam
 from game_sys.explosion_fx_sys import ExplosionFX
 from game_sys.particle_sys import ParticleFX
-from game_sys.spawn_sys import SpawnSys
+from game_sys.game_sys import Game
 from game_sys.ui_sys import GameMessage, CounterHitSys
 from layer import Layer
 
@@ -25,10 +25,10 @@ if __name__ == '__main__':
     pygame.display.set_caption('Shoot The Asteroids')
     clock = pygame.time.Clock()
 
-    spawner = SpawnSys()
-    spaceship, score = spawner.create_game_world_sprites()
-    sprites = spawner.get_layer_updates
-    asteroids: list[Asteroid] = spawner.spawned_asteroids
+    game = Game()
+    spaceship, score = game.init_game()
+    sprites = game.get_layer_updates
+    asteroids: list[Asteroid] = game.spawned_asteroids
 
     # assets.get_audio('ost').play(loops=-1).set_volume(.8)
     while run:
@@ -37,7 +37,7 @@ if __name__ == '__main__':
         for event in events:
             if event.type == pygame.QUIT:
                 run = False
-                spawner.stop()
+                game.stop()
             # shooting beams
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE and not game_over:
                 beams.append(
@@ -52,7 +52,7 @@ if __name__ == '__main__':
                 game_started = True
 
         # Asteroids waves
-        spawner.wave_switcher(game_started)
+        game.wave_switcher(game_started)
         # Collision check!
         for asteroid in asteroids:
             asteroid.asteroid_behavior(asteroids)
@@ -63,7 +63,7 @@ if __name__ == '__main__':
                 spaceship.kill()
                 sprites.remove_sprites_of_layer(Layer.PLAYER)
                 game_over = True
-                # spawner.stop()
+                game.stop()
                 beams.clear()
                 game_over_message = GameMessage(sprites)
             if beams:
@@ -78,7 +78,7 @@ if __name__ == '__main__':
                             ExplosionFX(sprites, collided=asteroid)
                             asteroids.remove(asteroid)
                         beams.remove(beam)
-        if len(spawner.get_layer_updates.get_sprites_from_layer(Layer.PLAYER)) == 0 and not game_over:
+        if len(game.get_layer_updates.get_sprites_from_layer(Layer.PLAYER)) == 0 and not game_over:
             game_over = True
             game_started = False
             GameMessage(sprites)
@@ -87,7 +87,7 @@ if __name__ == '__main__':
         if beams:
             for beam in beams:
                 alien: AlienSpaceship
-                for alien in spawner.get_layer_updates.get_sprites_from_layer(Layer.ALIEN):
+                for alien in game.get_layer_updates.get_sprites_from_layer(Layer.ALIEN):
                     sprites_from_layer = sprites.get_sprites_from_layer(Layer.WEAPON)
                     if alien.rect.collidepoint(beam.rect.centerx, beam.rect.centery):
                         alien.damage()
