@@ -4,9 +4,8 @@ import pygame
 from pygame.sprite import AbstractGroup
 from pygame.math import Vector2
 
-import assets
-import configs
-from layer import Layer
+from game_sys import configs, assets
+from game_sys.layer import Layer
 
 
 class Asteroid(pygame.sprite.Sprite):

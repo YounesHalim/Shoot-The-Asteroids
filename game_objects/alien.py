@@ -5,11 +5,10 @@ import pygame
 from pygame.math import Vector2
 from pygame.sprite import AbstractGroup
 
-import assets
-import configs
+from game_sys import configs, assets
 from game_objects.spaceship import Spaceship
 from game_objects.weapons import LaserBeam
-from layer import Layer
+from game_sys.layer import Layer
 from random import randint
 
 
