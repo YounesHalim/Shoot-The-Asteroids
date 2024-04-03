@@ -145,7 +145,7 @@ class FirstWave(WaveSys):
         self.game = game
         self.wave = threading.Thread(target=self.spawn_asteroids, args=(self.__ASTEROIDS, self.__SPEED,))
         self.wave.start()
-        self.spawn_aliens()
+        # self.spawn_aliens()
 
     def spawn_asteroids(self, number: int = None, delay: int | float = None):
         self.game.spawn_asteroids(number, delay)
