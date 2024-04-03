@@ -1,11 +1,12 @@
 import threading
 import time
+import pygame
 
 from pygame.sprite import LayeredUpdates, AbstractGroup
 from abc import ABC, abstractmethod
 from random import randint
 
-from game_sys import assets
+from game_sys import assets, configs
 from game_objects.alien import AlienSpaceship
 from game_objects.asteroid import Asteroid
 from game_objects.background import Background
@@ -41,6 +42,11 @@ class Game(threading.Thread, WaveSys):
         ...
 
     def __init__(self):
+        pygame.init()
+        pygame.mixer.pre_init(44100, 24, 2, 4096)
+        self.__screen = pygame.display.set_mode((configs.SCREEN_WIDTH, configs.SCREEN_HEIGHT))
+        pygame.display.set_caption('Shoot The Asteroids!')
+        self.__clock = pygame.time.Clock()
         self.__sprites = LayeredUpdates()
         assets.load_sprites()
         assets.load_audios()
@@ -102,6 +108,14 @@ class Game(threading.Thread, WaveSys):
     @property
     def lock(self):
         return self._lock
+
+    @property
+    def get_screen(self):
+        return self.__screen
+
+    @property
+    def get_clock(self):
+        return self.__clock
 
 
 class MainMenu(WaveSys, StartGame):
