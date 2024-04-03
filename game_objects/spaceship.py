@@ -4,11 +4,10 @@ import pygame
 from pygame.sprite import AbstractGroup
 from pygame.math import Vector2
 
-import assets
-import configs
+from game_sys import configs, assets
 from game_sys.explosion_fx_sys import ExplosionFX
 from game_sys.particle_sys import ParticleFX
-from layer import Layer
+from game_sys.layer import Layer
 from abc import ABC, abstractmethod
 
 
@@ -28,7 +27,7 @@ class Spaceship(pygame.sprite.Sprite):
         self.destroy: Union[ExplosionFX, None] = None
         super().__init__(*groups)
 
-    def __setstate__(self, state):
+    def set_state(self, state):
         self.state = state
 
     def update(self, *args, **kwargs):
@@ -41,18 +40,18 @@ class Spaceship(pygame.sprite.Sprite):
 
         # Check for left and right movement
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-            self.__setstate__(TiltLeftState(self))
+            self.set_state(TiltLeftState(self))
         elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-            self.__setstate__(TiltRightState(self))
+            self.set_state(TiltRightState(self))
         # Check for up and down movement
         if keys[pygame.K_DOWN] or keys[pygame.K_s]:
-            self.__setstate__(MoveBackward(self))
+            self.set_state(MoveBackward(self))
         elif keys[pygame.K_UP] or keys[pygame.K_w]:
-            self.__setstate__(MoveForward(self))
+            self.set_state(MoveForward(self))
 
         # If no keys pressed, return to idle state
         if not any(keys):
-            self.__setstate__(IdleState(self))
+            self.set_state(IdleState(self))
 
     def __prevent_deserting(self) -> None:
         if self.rect.left <= 0:
@@ -65,7 +64,7 @@ class Spaceship(pygame.sprite.Sprite):
             self.rect.bottom = configs.SCREEN_HEIGHT
 
     def manage_health(self) -> None:
-        self.__setstate__(HealthManagementState(self))
+        self.set_state(HealthManagementState(self))
 
     def get_health(self) -> int:
         return self.spaceship_health

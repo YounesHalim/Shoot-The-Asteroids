@@ -5,7 +5,7 @@ from pygame.sprite import LayeredUpdates, AbstractGroup
 from abc import ABC, abstractmethod
 from random import randint
 
-import assets
+from game_sys import assets
 from game_objects.alien import AlienSpaceship
 from game_objects.asteroid import Asteroid
 from game_objects.background import Background
@@ -54,7 +54,7 @@ class Game(threading.Thread, WaveSys):
     def stop(self):
         self._stop_event.set()
 
-    def __setstate__(self, state):
+    def set_state(self, state):
         self.state = state
 
     def wave_switcher(self, game_started: bool):
@@ -62,12 +62,12 @@ class Game(threading.Thread, WaveSys):
         if game_started:
             if isinstance(self.state, MainMenu):
                 self.state.remove_intro_layout(True)
-                self.__setstate__(FirstWave(self))
+                self.set_state(FirstWave(self))
             elif isinstance(self.state, FirstWave) and not self.state.wave.is_alive() and len(self.__asteroids) == 0:
-                self.__setstate__((WaveDifficultyManager(self)))
+                self.set_state((WaveDifficultyManager(self)))
                 return
-            self.__setstate__((WaveDifficultyManager(self))) if isinstance(self.state,
-                                                                           WaveDifficultyManager) and not self.state.wave.is_alive() and len(
+            self.set_state((WaveDifficultyManager(self))) if isinstance(self.state,
+                                                                        WaveDifficultyManager) and not self.state.wave.is_alive() and len(
                 self.__asteroids) == 0 else None
 
     def init_game(self):

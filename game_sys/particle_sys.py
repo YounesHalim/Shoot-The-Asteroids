@@ -3,8 +3,8 @@ import random
 import pygame
 from pygame.sprite import AbstractGroup
 
-import configs
-from layer import Layer
+from game_sys import configs
+from game_sys.layer import Layer
 
 
 class ParticleFX(pygame.sprite.Sprite):

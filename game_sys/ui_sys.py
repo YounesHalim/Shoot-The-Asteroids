@@ -3,11 +3,10 @@ from typing import Union, Any
 import pygame
 from pygame.sprite import AbstractGroup
 
-import assets
-import configs
+from game_sys import configs, assets
 from game_objects.asteroid import Asteroid
 from game_objects.sound import SoundFX
-from layer import Layer
+from game_sys.layer import Layer
 
 
 class Score(pygame.sprite.Sprite):
