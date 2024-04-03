@@ -53,7 +53,6 @@ class GameMessage(pygame.sprite.Sprite):
 
 
 class CounterHitSys(pygame.sprite.Sprite, SoundFX):
-    __COUNTER = 0
     __HIT_SOUND_FX = 'hit'
     __ALIEN_SPACESHIP = 20
     __ASTEROID = 4
@@ -70,11 +69,12 @@ class CounterHitSys(pygame.sprite.Sprite, SoundFX):
         self.scalex, self.scale_y = scale[0], scale[1]
         self.image = pygame.transform.scale(self.sprite_asset, (self.scalex, self.scale_y))
         self.rect = self.image.get_rect(topright=(self.game_object.rect.x + 10, self.game_object.rect.y))
-        self.__lifetime = configs.FPS
+        self.__lifetime = configs.FPS * 2
         self.__fade_start = configs.FPS // 2  # Start fading out halfway through the lifetime
         self.__fade_duration = configs.FPS // 10  # Fading duration
         self.__fade_alpha = 255  # Initial opacity
         self.score = score
+        self.score.value += 1
         self.hit_sound = assets.get_audio(self.__HIT_SOUND_FX)
         self.play()
         self.ast_is_destroyed = self.game_object.is_destroyed()
@@ -84,8 +84,8 @@ class CounterHitSys(pygame.sprite.Sprite, SoundFX):
         super().__init__(*groups)
 
     def update(self, *args, **kwargs):
-        self.__fadeout()
         self.__scale_image()
+        self.__fadeout()
 
     def __fadeout(self):
         self.__lifetime -= 3
@@ -95,14 +95,16 @@ class CounterHitSys(pygame.sprite.Sprite, SoundFX):
 
         if self.__lifetime <= 0:
             self.kill()
-        if self.ast_is_destroyed:
-            self.score.value += self.__ASTEROID
-            self.ast_is_destroyed = False
 
     def __scale_image(self):
         self.rect.y -= 1
         self.scalex += 1
         self.scale_y += 1
+        if self.ast_is_destroyed:
+            self.sprite_asset = assets.get_sprite('4')
+            self.__lifetime = configs.FPS * 3
+            self.score.value += self.__ASTEROID
+            self.ast_is_destroyed = False
         self.image = pygame.transform.scale(self.sprite_asset, (self.scalex, self.scale_y))
 
     def play(self):
