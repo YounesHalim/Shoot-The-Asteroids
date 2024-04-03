@@ -2,8 +2,7 @@ import sys
 
 import pygame
 
-import assets
-import configs
+from game_sys import configs
 from game_objects.alien import AlienSpaceship
 from game_objects.asteroid import Asteroid
 from game_objects.spaceship import Spaceship
@@ -12,7 +11,7 @@ from game_sys.explosion_fx_sys import ExplosionFX
 from game_sys.particle_sys import ParticleFX
 from game_sys.game_sys import Game
 from game_sys.ui_sys import GameMessage, CounterHitSys
-from layer import Layer
+from game_sys.layer import Layer
 
 if __name__ == '__main__':
     pygame.init()
