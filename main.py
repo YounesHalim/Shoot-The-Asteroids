@@ -2,7 +2,7 @@ import sys
 
 import pygame
 
-from game_sys import configs
+from game_sys import configs, assets
 from game_objects.alien import AlienSpaceship
 from game_objects.asteroid import Asteroid
 from game_objects.spaceship import Spaceship
@@ -14,22 +14,18 @@ from game_sys.ui_sys import GameMessage, CounterHitSys
 from game_sys.layer import Layer
 
 if __name__ == '__main__':
-    pygame.init()
-    pygame.mixer.pre_init(44100, 24, 2, 4096)
-    run = True
-    game_over = False
-    game_started = False
-    beams = []
-    screen = pygame.display.set_mode((configs.SCREEN_WIDTH, configs.SCREEN_HEIGHT))
-    pygame.display.set_caption('Shoot The Asteroids')
-    clock = pygame.time.Clock()
 
     game = Game()
+    screen = game.get_screen
+    clock = game.get_clock
     spaceship, score = game.init_game()
     sprites = game.get_layer_updates
     asteroids: list[Asteroid] = game.spawned_asteroids
+    beams: list[LaserBeam] = []
+    run = True
+    game_over = False
+    game_started = False
 
-    # assets.get_audio('ost').play(loops=-1).set_volume(.8)
     while run:
         events = pygame.event.get()
         # Handling events
@@ -49,6 +45,7 @@ if __name__ == '__main__':
                 game_over = False
             if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN and not game_started:
                 game_started = True
+                assets.get_audio('ost').play(loops=-1).set_volume(.8)
 
         # Asteroids waves
         game.wave_switcher(game_started)
