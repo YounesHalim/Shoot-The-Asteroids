@@ -59,7 +59,6 @@ if __name__ == '__main__':
                 spaceship.kill()
                 sprites.remove_sprites_of_layer(Layer.PLAYER)
                 game_over = True
-                game.stop()
                 beams.clear()
                 game_over_message = GameMessage(sprites)
             if beams:
