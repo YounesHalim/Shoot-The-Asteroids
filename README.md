@@ -12,9 +12,9 @@ https://github.com/YounesHalim/Shoot-The-Asteroids/assets/97858052/4be510e2-66e8
 
 ## Sound effects and assets
 
-- Soundtrack and laser beam effects were from PSone game called Apocalypse developed by Activision.
-- Explosion sound effects from metal slug 3.
-- Other assets from 
+- The soundtrack and laser beam effects were sourced from the PSone game "Apocalypse".
+- Explosion sound effects are taken from "Metal Slug 3."
+- Sprites are obtained from itch.io.
 
 ## How to Play
 
