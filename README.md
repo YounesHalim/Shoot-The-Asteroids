@@ -6,7 +6,8 @@ Welcome to Shoot The Asteroids!, a thrilling 2D arcade space shooter. Developed 
 
 In Shoot The Asteroids!, your objective is to pilot a spaceship through asteroid-filled space and destroy as many asteroids as possible. Maneuver your spacecraft using the arrow keys and shoot lasers with the spacebar. Be cautious and avoid colliding with asteroids, as each collision destroys your spaceship.
 
-![screen record](gameplay.mov)
+[//]: # (![screen record]&#40;gameplay.mov&#41;)
+<video src="gameplay.mov" width="320" height="240" controls></video>
 
 
 ## Sound effects and assets
