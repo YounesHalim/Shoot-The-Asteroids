@@ -10,7 +10,6 @@ In Shoot The Asteroids!, your objective is to pilot a spaceship through asteroid
 https://github.com/YounesHalim/Shoot-The-Asteroids/assets/97858052/c8df3f8d-c00b-4835-9799-3524f1c7af29
 
 
-
 ## Sound effects and assets
 
 - The soundtrack and laser beam effects were sourced from the PSone game "Apocalypse".
