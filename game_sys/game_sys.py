@@ -64,17 +64,32 @@ class Game(threading.Thread, WaveSys):
         self.state = state
 
     def wave_switcher(self, game_started: bool):
-
+        # Check if the game has started
         if game_started:
-            if isinstance(self.state, MainMenu):
-                self.state.remove_intro_layout(True)
-                self.set_state(FirstWave(self))
-            elif isinstance(self.state, FirstWave) and not self.state.wave.is_alive() and len(self.__asteroids) == 0:
-                self.set_state((WaveDifficultyManager(self)))
-                return
-            self.set_state((WaveDifficultyManager(self))) if isinstance(self.state,
-                                                                        WaveDifficultyManager) and not self.state.wave.is_alive() and len(
-                self.__asteroids) == 0 else None
+            current_state = self.state
+
+            # Transition from main menu to first wave
+            if isinstance(current_state, MainMenu):
+                self._transition_to_first_wave()
+
+            # Transition between waves
+            elif isinstance(current_state, FirstWave) and not current_state.wave.is_alive() and len(
+                    self.__asteroids) == 0:
+                self._transition_to_next_wave()
+
+            # Check if current state is WaveDifficultyManager and conditions met for transitioning to next wave
+            elif isinstance(current_state, WaveDifficultyManager) and not current_state.wave.is_alive() and len(
+                    self.__asteroids) == 0:
+                self._transition_to_next_wave()
+
+    def _transition_to_first_wave(self):
+        # Remove intro layout and set state to FirstWave
+        self.state.remove_intro_layout(True)
+        self.set_state(FirstWave(self))
+
+    def _transition_to_next_wave(self):
+        # Set state to a new instance of WaveDifficultyManager
+        self.set_state(WaveDifficultyManager(self))
 
     def init_game(self):
         Background(0, self.__sprites)
