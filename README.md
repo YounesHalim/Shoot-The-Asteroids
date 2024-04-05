@@ -30,10 +30,6 @@ https://github.com/YounesHalim/Shoot-The-Asteroids/assets/97858052/c8df3f8d-c00b
 
 If you're interested in contributing to this project, feel free to open a pull request. We welcome suggestions for adding new features, fixing bugs, or improving the overall experience.
 
-## License
-
-This project is licensed under the Apache License 2.0. For more information, please refer to the `LICENSE` file.
-
 ---
 
 If you have any questions or feedback, don't hesitate to reach out.
