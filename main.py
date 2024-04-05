@@ -30,7 +30,7 @@ if __name__ == '__main__':
         events = pygame.event.get()
         # Handling events
         for event in events:
-            if event.type == pygame.QUIT:
+            if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
                 run = False
                 game.stop()
             # shooting beams
