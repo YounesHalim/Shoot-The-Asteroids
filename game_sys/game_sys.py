@@ -160,7 +160,6 @@ class FirstWave(WaveSys):
         self.game = game
         self.wave = threading.Thread(target=self.spawn_asteroids, args=(self.__ASTEROIDS, self.__SPEED,))
         self.wave.start()
-        # self.spawn_aliens()
 
     def spawn_asteroids(self, number: int = None, delay: int | float = None):
         self.game.spawn_asteroids(number, delay)
@@ -176,7 +175,7 @@ class WaveDifficultyManager(WaveSys):
     __ASTEROIDS = 3
     __SPEED = 1
     __LEVEL = 1
-    __MAX_LEVEL = 7
+    __MAX_LEVEL = 200
 
     def __init__(self, game: Game):
         self.game = game

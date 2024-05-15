@@ -32,7 +32,6 @@ class ExplosionFX(pygame.sprite.Sprite, SoundFX):
         self.rect = self.image.get_rect()
         x, y = collided.rect.centerx, collided.rect.centery
         self.rect.center = [x, y]
-        self.mask = pygame.mask.from_surface(self.image)
         self.animation_speed = 0
         self.sound_fx = assets.get_audio(self.__EXPLOSION__SOUND_FX) if type(collided) is Asteroid else assets.get_audio(self.__SPACESHIP_EXPLOSION_SOUND_FX)
         pygame.mixer.music.set_volume(.7)

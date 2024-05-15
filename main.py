@@ -1,17 +1,17 @@
 import sys
 
 import pygame
+from pygame.sprite import collide_mask
 
-from game_sys import configs, assets
-from game_objects.alien import AlienSpaceship
 from game_objects.asteroid import Asteroid
 from game_objects.spaceship import Spaceship
 from game_objects.weapons import LaserBeam
+from game_sys import configs, assets
 from game_sys.explosion_fx_sys import ExplosionFX
-from game_sys.particle_sys import ParticleFX
 from game_sys.game_sys import Game
-from game_sys.ui_sys import GameMessage, CounterHitSys
 from game_sys.layer import Layer
+from game_sys.particle_sys import ParticleFX
+from game_sys.ui_sys import GameMessage, CounterHitSys
 
 if __name__ == '__main__':
 
@@ -52,7 +52,7 @@ if __name__ == '__main__':
         # Collision check!
         for asteroid in asteroids:
             asteroid.asteroid_behavior(asteroids)
-            if asteroid.rect.collidepoint(spaceship.rect.centerx, spaceship.rect.centery) and not game_over:
+            if pygame.sprite.spritecollide(asteroid, pygame.sprite.Group(spaceship), False, collide_mask) and not game_over:
                 ExplosionFX(sprites, collided=spaceship)
                 [ParticleFX(sprites, pos=(asteroid.rect.centerx, asteroid.rect.centery)) for particle in range(100)]
                 asteroid.kill()
@@ -63,7 +63,7 @@ if __name__ == '__main__':
                 game_over_message = GameMessage(sprites)
             if beams:
                 for beam in beams:
-                    if asteroid.rect.collidepoint(beam.rect.centerx, beam.rect.centery) and not game_over:
+                    if pygame.sprite.spritecollide(asteroid, pygame.sprite.Group(beam), False, collide_mask) and not game_over:
                         [ParticleFX(sprites, pos=(asteroid.rect.centerx, asteroid.rect.centery)) for particle in
                          range(10)]
                         asteroid.asteroid_hit()
@@ -73,28 +73,11 @@ if __name__ == '__main__':
                             ExplosionFX(sprites, collided=asteroid)
                             asteroids.remove(asteroid)
                         beams.remove(beam)
+
         if len(game.get_layer_updates.get_sprites_from_layer(Layer.PLAYER)) == 0 and not game_over:
             game_over = True
             game_started = False
             GameMessage(sprites)
-
-        # alien hit registration
-        if beams:
-            for beam in beams:
-                alien: AlienSpaceship
-                for alien in game.get_layer_updates.get_sprites_from_layer(Layer.ALIEN):
-                    sprites_from_layer = sprites.get_sprites_from_layer(Layer.WEAPON)
-                    if alien.rect.collidepoint(beam.rect.centerx, beam.rect.centery):
-                        alien.damage()
-                        CounterHitSys(sprites, game_object=alien, score=score)
-                        [ParticleFX(sprites, pos=(alien.rect.centerx, alien.rect.centery)) for particle in
-                         range(5)]
-                        beam.kill()
-                        if alien.is_destroyed():
-                            [ParticleFX(sprites, pos=(alien.rect.centerx, alien.rect.centery)) for particle in
-                             range(100)]
-                            alien.kill()
-                        beams.remove(beam)
 
         screen.fill(0)
         sprites.draw(screen)
