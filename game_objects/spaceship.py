@@ -17,9 +17,11 @@ class Spaceship(pygame.sprite.Sprite):
     def __init__(self, *groups: AbstractGroup):
         self._layer = Layer.PLAYER
         self.images = []
+        self.masks = []
         self.index = 0
         self.state = IdleState(self)
         self.image = self.images[self.index]
+        self.mask = self.masks[self.index]
         self.rect = self.image.get_rect(topleft=((configs.SCREEN_WIDTH // 2) - 32, configs.SCREEN_HEIGHT - 70))
         self.spaceship_health = self.__SPACESHIP_HEALTH
         self.mask = pygame.mask.from_surface(self.image)
@@ -70,34 +72,14 @@ class Spaceship(pygame.sprite.Sprite):
         return self.spaceship_health
 
 
-class SpaceshipState(ABC):
-    @abstractmethod
-    def fire(self, event=None): ...
-
-    @abstractmethod
-    def tilt_wing_left(self, event=None): ...
-
-    @abstractmethod
-    def tilt_wing_right(self, event=None): ...
-
-    @abstractmethod
-    def idle_state(self, event=None): ...
-
-
-class FireState(SpaceshipState):
+class FireState:
     def __init__(self, spaceship: Spaceship):
         self.spaceship = spaceship
 
-    def tilt_wing_left(self, event=None): ...
-
-    def tilt_wing_right(self, event=None): ...
-
-    def idle_state(self, event=None): ...
-
     def fire(self, event=None): ...
 
 
-class TiltLeftState(SpaceshipState):
+class TiltLeftState:
 
     def __init__(self, spaceship: Spaceship):
         self.spaceship = spaceship
@@ -105,25 +87,18 @@ class TiltLeftState(SpaceshipState):
             pygame.transform.scale(assets.get_sprite('tilt_left_1'), (100, 100)),
             pygame.transform.scale(assets.get_sprite('tilt_left_2'), (100, 100))
         ]
+        self.spaceship.masks = [pygame.mask.from_surface(image) for image in self.spaceship.images]
         self.vel = Vector2(-5, 0)
         self.tilt_wing_left()
 
-    def fire(self, event=None): ...
-
-    def tilt_wing_right(self, event=None): ...
-
-    def idle_state(self, event=None): ...
-
-    def tilt_wing_left(self, event=None):
+    def tilt_wing_left(self):
         self.spaceship.rect.move_ip(self.vel)
         self.spaceship.index += .1
         if self.spaceship.index < len(self.spaceship.images):
             self.spaceship.image = self.spaceship.images[int(self.spaceship.index)]
+            self.spaceship.mask = self.spaceship.masks[int(self.spaceship.index)]
 
-        # self.spaceship.image = pygame.transform.scale(assets.get_sprite('tilt_left_1'), (100, 100))
-
-
-class TiltRightState(SpaceshipState):
+class TiltRightState:
 
     def __init__(self, spaceship: Spaceship):
         self.spaceship = spaceship
@@ -131,63 +106,40 @@ class TiltRightState(SpaceshipState):
             pygame.transform.scale(assets.get_sprite('tilt_right_1'), (100, 100)),
             pygame.transform.scale(assets.get_sprite('tilt_right_2'), (100, 100))
         ]
+        self.spaceship.masks = [pygame.mask.from_surface(image) for image in self.spaceship.images]
         self.animation_speed = 0
         self.vel = Vector2(5, 0)
         self.tilt_wing_right()
 
-    def tilt_wing_right(self, event=None):
+    def tilt_wing_right(self):
         self.spaceship.rect.move_ip(self.vel)
         self.spaceship.index += .1
         if self.spaceship.index < len(self.spaceship.images):
             self.spaceship.image = self.spaceship.images[int(self.spaceship.index)]
-
-        # self.spaceship.image = pygame.transform.scale(assets.get_sprite('tilt_right'), (100, 100))
-
-    def fire(self, event=None): ...
-
-    def tilt_wing_left(self, event=None): ...
-
-    def idle_state(self, event=None): ...
+            self.spaceship.mask = self.spaceship.masks[int(self.spaceship.index)]
 
 
-class IdleState(SpaceshipState):
+class IdleState:
     def __init__(self, spaceship: Spaceship):
         self.spaceship = spaceship
         self.spaceship.images = [
             pygame.transform.scale(assets.get_sprite('idle'), (100, 100))
         ]
-        self.reversed = False
+        self.spaceship.masks = [pygame.mask.from_surface(self.spaceship.images[0])]
         self.spaceship.index = 0
         self.vel = Vector2(0, 0)
         self.idle_state()
 
-    def idle_state(self, event=None):
+    def idle_state(self):
         self.spaceship.image = self.spaceship.images[self.spaceship.index]
-
-    def fire(self, event=None):
-        ...
-
-    def tilt_wing_left(self, event=None):
-        ...
-
-    def tilt_wing_right(self, event=None):
-        ...
+        self.spaceship.mask = self.spaceship.masks[self.spaceship.index]
 
 
-class HealthManagementState(SpaceshipState):
+class HealthManagementState:
 
     def __init__(self, spaceship: Spaceship):
         self.spaceship = spaceship
         self.destroyed()
-        pass
-
-    def fire(self, event=None): ...
-
-    def tilt_wing_left(self, event=None): ...
-
-    def tilt_wing_right(self, event=None): ...
-
-    def idle_state(self, event=None): ...
 
     def damage_spaceship(self):
         self.spaceship.spaceship_health -= 20
@@ -204,50 +156,21 @@ class HealthManagementState(SpaceshipState):
          in range(10)]
 
 
-class MoveForward(SpaceshipState):
+class MoveForward:
     def __init__(self, spaceship: Spaceship):
         self.spaceship = spaceship
         self.vel = Vector2(0, -5)
         self.move_forward()
 
-    def fire(self, event=None):
-        pass
-
-    def tilt_wing_left(self, event=None):
-        pass
-
-    def tilt_wing_right(self, event=None):
-        pass
-
-    def idle_state(self, event=None):
-        pass
-
     def move_forward(self):
         self.spaceship.rect.move_ip(self.vel)
-        pass
 
 
-class MoveBackward(SpaceshipState):
+class MoveBackward:
     def __init__(self, spaceship: Spaceship):
         self.spaceship = spaceship
         self.vel = Vector2(0, 5)
         self.move_backward()
 
-    def fire(self, event=None):
-        pass
-
-    def tilt_wing_left(self, event=None):
-        pass
-
-    def tilt_wing_right(self, event=None):
-        pass
-
-    def idle_state(self, event=None):
-        pass
-
     def move_backward(self):
         self.spaceship.rect.move_ip(self.vel)
-        pass
-
-    def super_speed(self):
-        pass

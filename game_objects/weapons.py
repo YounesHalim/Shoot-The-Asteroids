@@ -30,19 +30,6 @@ class LaserBeam(pygame.sprite.Sprite, SoundFX):
         self.fire_beam()
         if self.rect.y >= configs.SCREEN_HEIGHT:
             self.kill()
-        pass
-
-    def __throttle(self):
-        # Implement throttle behavior for LaserBeam
-        pass
-
-    def __ammunition(self) -> None:
-        # Implement ammunition tracking for LaserBeam
-        pass
-
-    def __reload(self):
-        # Implement reloading behavior for LaserBeam
-        pass
 
     def fire_beam(self, ):
         if isinstance(self.object, Spaceship):

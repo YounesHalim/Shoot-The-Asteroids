@@ -21,9 +21,8 @@ class ParticleFX(pygame.sprite.Sprite):
         self.lifetime = configs.FPS  # Lifetime of the particle in frames
         super().__init__(*groups)
 
-    def update(self):
+    def update(self, *args, **kwargs):
         self.rect.move_ip(self.vel)  # Move the particle
         self.lifetime -= 1
         if self.lifetime <= 0:
             self.kill()  # Remove the particle from the group when its lifetime expires
-
