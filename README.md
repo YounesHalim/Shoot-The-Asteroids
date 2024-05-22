@@ -28,7 +28,8 @@ https://github.com/YounesHalim/Shoot-The-Asteroids/assets/97858052/c8df3f8d-c00b
 
 ## Contributions and Development
 
-If you're interested in contributing to this project, feel free to open a pull request. We welcome suggestions for adding new features, fixing bugs, or improving the overall experience.
+If you're interested in contributing to this project, feel free to open a pull request. 
+I welcome suggestions for adding new features, fixing bugs, or improving the overall experience.
 
 ---
 
